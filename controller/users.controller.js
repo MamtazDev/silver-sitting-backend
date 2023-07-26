@@ -19,7 +19,7 @@ const registerUser = async (req, res) => {
 
       await sendVerificationEmail(updatedUser);
       res.status(200).send({
-        message: "We have sent you verification code. Please check your email!",
+        message: "We have sent you verification link. Please check your email!",
         status: 200,
       });
     } else {
@@ -38,7 +38,7 @@ const registerUser = async (req, res) => {
       await sendVerificationEmail(user);
 
       res.status(200).send({
-        message: "We have sent you verification code. Please check your email!",
+        message: "We have sent you verification link. Please check your email!",
         status: 200,
       });
 
@@ -77,7 +77,95 @@ const emailVirification = async (req, res) => {
   }
 };
 
+const loginUser = async (req, res) => {
+  try {
+    const user = await User.findOne({ email: req.body.email });
+
+    if (user?.isVerified === false) {
+      return res.status(401).send({
+        message: "Please Verify your email.",
+      });
+    } else if (
+      user &&
+      bcrcypt.compareSync(req.body.password, user.password) &&
+      user?.isVerified === true
+    ) {
+      const accessTOken = generateToken(user);
+      return res.send({
+        message: "Logged in successfully",
+        status: 200,
+        user,
+        accessTOken,
+      });
+    } else {
+      res.status(401).send({
+        message: "Invalid user or password",
+        status: 401,
+      });
+    }
+  } catch (err) {
+    res.status(500).send({
+      message: err.message,
+    });
+  }
+};
+
+const getAllUsers = async (req, res) => {
+  try {
+    const users = await User.find({});
+    res.status(200).send({
+      data: users,
+      status: 200,
+    });
+  } catch (err) {
+    res.status(500).send({
+      message: err.message,
+    });
+  }
+};
+
+const deleteUser = async (req, res) => {
+  try {
+    await User.findOneAndDelete({ _id: req.params.id })
+      .exec()
+      .then((result) => {
+        res.status(200).send({
+          message: `${result.name} is successfully removed!`,
+          status: 200,
+        });
+      })
+      .catch((err) => {
+        res.send({
+          message: err.message,
+        });
+      });
+  } catch (err) {
+    res.status(500).send({
+      message: err.message,
+    });
+  }
+};
+
+const getUser = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id, {
+      name: 1,
+      email: 1,
+      isVerified: 1,
+    });
+    res.send(user);
+  } catch (err) {
+    res.status(500).send({
+      message: err.message,
+    });
+  }
+};
+
 module.exports = {
   registerUser,
   emailVirification,
+  loginUser,
+  getAllUsers,
+  deleteUser,
+  getUser,
 };
