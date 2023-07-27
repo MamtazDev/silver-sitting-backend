@@ -4,6 +4,7 @@ const connectDB = require("./config/db");
 const PORT = process.env.PORT || 8000;
 
 const usersRoutes = require("./routes/usersRoutes");
+const makeContactRoutes = require("./routes/makeContactRoutes");
 
 const app = express();
 
@@ -14,6 +15,7 @@ connectDB();
 
 // routes
 app.use("/api/users", usersRoutes);
+app.use("/api/makeContact", makeContactRoutes);
 
 app.get("/", (req, res) => {
   res.send("Sever is running");

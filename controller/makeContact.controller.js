@@ -13,7 +13,19 @@ const addNewContanctMessage = async (req, res) => {
     await newMakeContact.save();
     res.status(200).send({
       message: "Thanks for your message. We will contact you soon",
+      status: 200,
     });
+  } catch (err) {
+    res.status(500).send({
+      message: err.message,
+    });
+  }
+};
+
+const getAllMakeContactMessages = async (req, res) => {
+  try {
+    const allMessages = await MakeContact.find({});
+    res.send(allMessages);
   } catch (err) {
     res.status(500).send({
       message: err.message,
@@ -23,4 +35,5 @@ const addNewContanctMessage = async (req, res) => {
 
 module.exports = {
   addNewContanctMessage,
+  getAllMakeContactMessages,
 };
