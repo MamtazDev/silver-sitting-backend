@@ -62,9 +62,9 @@ const emailVirification = async (req, res) => {
     const user = await User.findOne({ email });
 
     if (!user) {
-      res.redirect(`${process.env.MAINWEBSITE_URL}/jkkj`);
+      res.redirect(`${process.env.MAINWEBSITE_URL}/registrationError`);
     } else if (user && user?.isVerified === true) {
-      res.redirect(`${process.env.MAINWEBSITE_URL}/jkkj`);
+      res.redirect(`${process.env.MAINWEBSITE_URL}/registrationError`);
     } else {
       user.isVerified = true;
       await user.save();
@@ -84,13 +84,14 @@ const loginUser = async (req, res) => {
     if (user?.isVerified === false) {
       return res.status(401).send({
         message: "Please Verify your email.",
+        status: 400,
       });
     } else if (
       user &&
       bcrcypt.compareSync(req.body.password, user.password) &&
       user?.isVerified === true
     ) {
-      const accessTOken = generateToken(user);
+      const accessTOken = await generateToken(user);
       return res.send({
         message: "Logged in successfully",
         status: 200,
@@ -106,6 +107,56 @@ const loginUser = async (req, res) => {
   } catch (err) {
     res.status(500).send({
       message: err.message,
+    });
+  }
+};
+
+const editUser = async (req, res) => {
+  const {
+    image,
+    firstName,
+    lastName,
+    postCode,
+    residance,
+    gender,
+    availability,
+    offerProvide,
+    aboutMe,
+    phoneNumber,
+    streetOrHouseNumber,
+  } = req.body;
+  try {
+    const user = await User.findById(req.params.id);
+
+    if (user) {
+      user.image = image;
+      user.firstName = firstName;
+      user.lastName = lastName;
+      user.postCode = postCode;
+      user.residance = residance;
+      user.streetOrHouseNumber = streetOrHouseNumber;
+      user.gender = gender;
+      user.availability = availability;
+      user.offerProvide = offerProvide;
+      user.aboutMe = aboutMe;
+      user.phoneNumber = phoneNumber;
+
+      await user.save();
+
+      res.status(200).send({
+        data: user,
+        message: "User updated successfully",
+        status: 200,
+      });
+    } else {
+      res.status(401).send({
+        message: "There is no such user",
+        status: 400,
+      });
+    }
+  } catch (error) {
+    res.status(500).send({
+      message: error.message,
     });
   }
 };
@@ -148,15 +199,49 @@ const deleteUser = async (req, res) => {
 
 const getUser = async (req, res) => {
   try {
-    const user = await User.findById(req.params.id, {
-      name: 1,
-      email: 1,
-      isVerified: 1,
-    });
+    const user = await User.findById(req.params.id).select("-password");
     res.send(user);
   } catch (err) {
     res.status(500).send({
       message: err.message,
+    });
+  }
+};
+
+const uploadDocuments = async (req, res) => {
+  console.log("upload docs");
+
+  try {
+    const user = User.findById(req.params.id);
+    if (user) {
+      // user.url = req.body.url;
+      // user.parentSearch = req.body.parentSearch;
+      // console.log("user", req.body);
+      // await user.save();
+
+      const result = await User.updateOne(
+        { _id: req.params.id },
+        {
+          $set: {
+            url: req.body.url,
+            parentSearch: req.body.parentSearch,
+          },
+        }
+      );
+
+      res.status(200).send({
+        message: "Documents uploaded successfully!",
+        status: 200,
+      });
+    } else {
+      res.status(401).send({
+        message: "There is no such user",
+        status: 400,
+      });
+    }
+  } catch (error) {
+    res.status(500).send({
+      message: error.message,
     });
   }
 };
@@ -168,4 +253,6 @@ module.exports = {
   getAllUsers,
   deleteUser,
   getUser,
+  editUser,
+  uploadDocuments,
 };

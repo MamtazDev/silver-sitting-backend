@@ -5,7 +5,13 @@ const userSchema = new mongoose.Schema(
     role: {
       type: String,
       required: true,
-      enum: ["childCareProvider", "parent"],
+      enum: ["childcarer", "parents", "admin"],
+    },
+    image: {
+      type: String,
+      required: false,
+      default:
+        "https://t4.ftcdn.net/jpg/03/64/21/11/360_F_364211147_1qgLVxv1Tcq0Ohz3FawUfrtONzz8nq3e.jpg",
     },
     firstName: {
       type: String,
@@ -23,6 +29,10 @@ const userSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
+    phoneNumber: {
+      type: String,
+      required: false,
+    },
     residance: {
       type: String,
       required: true,
@@ -36,6 +46,23 @@ const userSchema = new mongoose.Schema(
       required: false,
       default: "fkljsklfklsfkljsf",
     },
+    gender: {
+      type: String,
+      required: false,
+      enum: ["Male", "Female"],
+    },
+    availability: {
+      type: [String],
+      required: false,
+    },
+    offerProvide: {
+      type: [String],
+      required: false,
+    },
+    aboutMe: {
+      type: String,
+      required: false,
+    },
     password: {
       type: String,
       required: true,
@@ -44,6 +71,10 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
       required: false,
+    },
+    parentSearch: {
+      type: Boolean,
+      default: false,
     },
   },
   {
