@@ -26,6 +26,18 @@ const addFeedback = async (req, res) => {
   }
 };
 
+const getAllFeedbacks = async (req, res) => {
+  try {
+    const feedbacks = await Feedback.find({});
+    res.status(200).send(feedbacks);
+  } catch (error) {
+    res.status(500).send({
+      message: error.message,
+    });
+  }
+};
+
 module.exports = {
   addFeedback,
+  getAllFeedbacks,
 };
