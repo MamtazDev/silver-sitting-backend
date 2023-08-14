@@ -76,6 +76,10 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    distance: {
+      type: String,
+      default: false,
+    },
   },
   {
     timestamps: true,
