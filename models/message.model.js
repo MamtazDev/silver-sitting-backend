@@ -4,12 +4,15 @@ const messageSchema = new mongoose.Schema(
   {
     conversationId: {
       type: String,
+      required: true,
     },
     sender: {
       type: String,
+      required: true,
     },
     text: {
       type: String,
+      required: true,
     },
   },
   {
@@ -17,4 +20,6 @@ const messageSchema = new mongoose.Schema(
   }
 );
 
-module.exports = mongoose.model("Message", messageSchema);
+const Message = mongoose.model("Message", messageSchema);
+
+module.exports = Message;
