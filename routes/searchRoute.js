@@ -1,12 +1,8 @@
 const express = require("express");
-const {
-  searchController
-} = require("../controller/search.controller");
-
-
+const { searchChildCarer } = require("../controller/search.controller");
 
 const router = express.Router();
 
-router.get("/", searchController);
+router.get("/", searchChildCarer);
 
 module.exports = router;

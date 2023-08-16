@@ -129,7 +129,7 @@ const editUser = async (req, res) => {
     const user = await User.findById(req.params.id);
 
     if (user) {
-      const distance = "";
+      // const distance = "";
 
       user.image = image;
       user.firstName = firstName;
@@ -142,7 +142,7 @@ const editUser = async (req, res) => {
       user.offerProvide = offerProvide;
       user.aboutMe = aboutMe;
       user.phoneNumber = phoneNumber;
-      user.distance = distance;
+      // user.distance = distance;
 
       await user.save();
 
