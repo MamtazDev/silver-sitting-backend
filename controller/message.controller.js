@@ -22,7 +22,21 @@ const getMessageByConversationId = async (req, res) => {
   }
 };
 
+const getMessagesBySender = async (req, res) => {
+  const { senderId, conversationId } = req.params;
+  try {
+    const messages = await Message.find({
+      conversationId: conversationId,
+      sender: senderId,
+    });
+    res.status(200).send(messages);
+  } catch (err) {
+    res.status(500).send(err);
+  }
+};
+
 module.exports = {
   addMessage,
   getMessageByConversationId,
+  getMessagesBySender,
 };

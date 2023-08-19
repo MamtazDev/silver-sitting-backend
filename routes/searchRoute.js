@@ -3,6 +3,6 @@ const { searchChildCarer } = require("../controller/search.controller");
 
 const router = express.Router();
 
-router.get("/", searchChildCarer);
+router.post("/", searchChildCarer);
 
 module.exports = router;
