@@ -28,8 +28,25 @@ const getMessagesBySender = async (req, res) => {
     const messages = await Message.find({
       conversationId: conversationId,
       sender: senderId,
+      isSeen: false,
     });
     res.status(200).send(messages);
+  } catch (err) {
+    res.status(500).send(err);
+  }
+};
+
+const putMessageSeen = async (req, res) => {
+  const { senderId, conversationId } = req.params;
+
+  try {
+    const messages = await Message.updateMany(
+      { sender: senderId, conversationId: conversationId },
+      { $set: { isSeen: true } }
+    );
+    res.status(200).send({
+      message: "All message seen",
+    });
   } catch (err) {
     res.status(500).send(err);
   }
@@ -39,4 +56,5 @@ module.exports = {
   addMessage,
   getMessageByConversationId,
   getMessagesBySender,
+  putMessageSeen,
 };
