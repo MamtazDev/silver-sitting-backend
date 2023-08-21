@@ -64,11 +64,11 @@ const emailVirification = async (req, res) => {
     if (!user) {
       res.redirect(`${process.env.MAINWEBSITE_URL}/registrationError`);
     } else if (user && user?.isVerified === true) {
-      res.redirect(`${process.env.MAINWEBSITE_URL}/registrationError`);
+      res.redirect(`${process.env.MAINWEBSITE_URL}/register-success-sms`);
     } else {
       user.isVerified = true;
       await user.save();
-      res.redirect(`${process.env.MAINWEBSITE_URL}/register-success-sms`);
+      res.redirect(`${process.env.MAINWEBSITE_URL}/login`);
     }
   } catch (err) {
     res.status(500).send({
