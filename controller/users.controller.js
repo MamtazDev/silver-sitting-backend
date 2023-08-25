@@ -1,6 +1,7 @@
 const User = require("../models/users.model");
 const bcrcypt = require("bcryptjs");
 const { generateToken, sendVerificationEmail } = require("../utils/auth");
+const { distanceCal } = require("./search.controller");
 
 const registerUser = async (req, res) => {
   try {
@@ -23,6 +24,10 @@ const registerUser = async (req, res) => {
         status: 200,
       });
     } else {
+      const residance = req.body.residance;
+
+      const distance = await distanceCal(residance);
+
       const newUser = new User({
         role: req.body.role,
         firstName: req.body.firstName,
@@ -30,6 +35,7 @@ const registerUser = async (req, res) => {
         email: req.body.email,
         postCode: req.body.postCode,
         residance: req.body.residance,
+        distance: distance,
         password: bcrcypt.hashSync(req.body.password),
       });
       const user = await newUser.save();
