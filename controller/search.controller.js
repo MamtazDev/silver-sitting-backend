@@ -33,27 +33,49 @@ const searchChildCarer = async (req, res) => {
   try {
     if (searchedDistance) {
       if (searchedDistance > 100) {
-        res.status(400).send("Error");
-      }
-    }
-
-    const filteredUser = await User.aggregate(filtering);
-    if (filteredUser.length > 0) {
-      const users = [];
-      for (i = 0; i < filteredUser.length; i++) {
-        const distance = await distanceCal(
-          filteredUser[i].residance,
-          userAddress
-        );
-        if (distance <= 30) {
-          users.push(filteredUser[i]);
-          console.log(distance);
+        res.status(401).send({
+          message: "Distance is more than 100",
+          status: 401,
+        });
+      } else {
+        const filteredUser = await User.aggregate(filtering);
+        if (filteredUser.length > 0) {
+          const users = [];
+          for (i = 0; i < filteredUser.length; i++) {
+            const distance = await distanceCal(
+              filteredUser[i].residance,
+              userAddress
+            );
+            if (distance <= searchedDistance) {
+              users.push({ ...filteredUser[i], measuredDistance: distance });
+            }
+          }
+          res.status(200).send(users);
+        } else {
+          res.status(401).send({
+            message: "No matched users",
+          });
         }
-        console.log(users);
+      }
+    } else {
+      const filteredUser = await User.aggregate(filtering);
+      if (filteredUser.length > 0) {
+        const users = [];
+        for (i = 0; i < filteredUser.length; i++) {
+          const distance = await distanceCal(
+            filteredUser[i].residance,
+            userAddress
+          );
+
+          users.push({ ...filteredUser[i], measuredDistance: distance });
+        }
+        res.status(200).send(users);
+      } else {
+        res.status(401).send({
+          message: "No matched users",
+        });
       }
     }
-    res.send(filteredUser);
-    console.log(userAddress, "uss");
   } catch (error) {
     res.status(500).send(error);
   }

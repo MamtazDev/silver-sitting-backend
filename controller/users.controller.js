@@ -1,7 +1,6 @@
 const User = require("../models/users.model");
 const bcrcypt = require("bcryptjs");
 const { generateToken, sendVerificationEmail } = require("../utils/auth");
-const { distanceCal } = require("./search.controller");
 
 const registerUser = async (req, res) => {
   try {
@@ -24,10 +23,6 @@ const registerUser = async (req, res) => {
         status: 200,
       });
     } else {
-      const residance = req.body.residance;
-
-      const distance = await distanceCal(residance);
-
       const newUser = new User({
         role: req.body.role,
         firstName: req.body.firstName,
@@ -35,7 +30,6 @@ const registerUser = async (req, res) => {
         email: req.body.email,
         postCode: req.body.postCode,
         residance: req.body.residance,
-        distance: distance,
         password: bcrcypt.hashSync(req.body.password),
       });
       const user = await newUser.save();
@@ -70,12 +64,22 @@ const emailVirification = async (req, res) => {
     if (!user) {
       res.redirect(`${process.env.MAINWEBSITE_URL}/registrationError`);
     } else if (user && user?.isVerified === true) {
-      res.redirect(`${process.env.MAINWEBSITE_URL}/register-success-sms`);
+      res.redirect(`${process.env.MAINWEBSITE_URL}/registration-success-sms`);
     } else {
       user.isVerified = true;
       await user.save();
       res.redirect(`${process.env.MAINWEBSITE_URL}/login`);
     }
+
+    // if (!user) {
+    //   res.redirect(`${process.env.MAINWEBSITE_URL}/registrationError`);
+    // } else if (user && user?.isVerified === true) {
+    //   res.redirect(`${process.env.MAINWEBSITE_URL}/registrationError`);
+    // } else {
+    //   user.isVerified = true;
+    //   await user.save();
+    //   res.redirect(`${process.env.MAINWEBSITE_URL}/register-success-sms`);
+    // }
   } catch (err) {
     res.status(500).send({
       message: err.message,
