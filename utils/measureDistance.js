@@ -47,11 +47,18 @@ function preparecoordinates(city) {
     let lon = "";
     let address = city;
     let item = { address, lat, lon };
+
     resolve(item);
   });
 }
 
-function distanceInKmBetweenEarthCoordinates(lat1, lon1, lat2, lon2, Konst) {
+async function distanceInKmBetweenEarthCoordinates(
+  lat1,
+  lon1,
+  lat2,
+  lon2,
+  Konst
+) {
   var earthRadiusKm = 6371;
 
   var dLat = degreesToRadians(lat2 - lat1, Konst);
@@ -71,31 +78,72 @@ function degreesToRadians(degrees, Konst) {
   return degrees * Konst;
 }
 
-const distanceCal = async (city, userAddress) => {
-  let distance;
+const distanceCal = async (user, searchcity) => {
   try {
-    await preparecoordinates(city)
-      .then((item) => {
-        return getcoordinatesfrombackend(item);
-      })
-      .then((result) => {
-        const ownerAddress = userAddress;
-        var Konst = Math.PI / 180;
-        const calDistance = distanceInKmBetweenEarthCoordinates(
-          ownerAddress.lat,
-          ownerAddress.lon,
-          result.lat,
-          result.lon,
-          Konst
-        );
-        distance = calDistance;
-      });
+    const userLocationInfo = await preparecoordinates(user).then(
+      async (item) => {
+        const latLonData = getcoordinatesfrombackend(item);
+        return latLonData;
+      }
+    );
+
+    const searchLocationInfo = await preparecoordinates(searchcity).then(
+      async (item) => {
+        const latLonData = getcoordinatesfrombackend(item);
+        return latLonData;
+      }
+    );
+
+    const konst = Math.PI / 180;
+
+    const distance = await distanceInKmBetweenEarthCoordinates(
+      userLocationInfo.lat,
+      userLocationInfo.lon,
+      searchLocationInfo.lat,
+      searchLocationInfo.lon,
+      konst
+    );
 
     return distance;
   } catch (error) {
     return false;
   }
 };
+// const distanceCal = async (userAddress, city) => {
+//   let distance;
+//   try {
+//     await preparecoordinates("Mohammdpur, Dhaka 1206, bangladesh")
+//       .then(async (item) => {
+//         console.log(item, "iii");
+//         const latLonData = await getcoordinatesfrombackend(item);
+
+//         return latLonData;
+//       })
+//       .then((result) => {
+//         // const ownerAddress = userAddress;
+//         var Konst = Math.PI / 180;
+//         // distance = { item: item, result: result };
+//         console.log("Result Lat:", result);
+
+//         // const calDistance = distanceInKmBetweenEarthCoordinates(
+//         //   ownerAddress.lat,
+//         //   ownerAddress.lon,
+//         //   result.lat,
+//         //   result.lon,
+//         //   Konst
+//         // );
+//         // distance = calDistance;
+//         console.log("Calculated Distance: ", distance);
+
+//         res.status(500).send({
+//           result: result,
+//           message: "Successfully calculate distance!",
+//         });
+//       });
+//   } catch (error) {
+//     res.status(500).send({ error, gg: "hh" });
+//   }
+// };
 
 module.exports = {
   distanceCal,
